@@ -1,0 +1,5 @@
+cloudflare_api_token  = "set-with-TF_VAR_cloudflare_api_token-instead"
+cloudflare_account_id = "your-cloudflare-account-id"
+application_name      = "portfolio"
+environment           = "production"
+r2_location           = "WEUR"

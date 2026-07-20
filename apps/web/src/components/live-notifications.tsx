@@ -1,0 +1,13 @@
+'use client';
+import { useQueryClient } from '@tanstack/react-query';
+import { usePathname } from 'next/navigation';
+import { useEffect,useState } from 'react';
+import { streamAdminNotifications,type LiveNotification } from '@/lib/admin-api';
+
+export function LiveNotifications(){
+  const pathname=usePathname();const enabled=pathname!='/admin/login';const client=useQueryClient();const [status,setStatus]=useState<'connecting'|'live'|'offline'>('connecting');const [items,setItems]=useState<LiveNotification[]>([]);
+  useEffect(()=>{if(!enabled)return;const controller=new AbortController();let reconnect:ReturnType<typeof setTimeout>|undefined;let stopped=false;const connect=async()=>{setStatus('connecting');try{await streamAdminNotifications(controller.signal,event=>{setItems(current=>[event,...current.filter(item=>item.id!==event.id)].slice(0,5));if(event.type.startsWith('contact.'))void client.invalidateQueries({queryKey:['admin-contacts']});if(event.type==='media.updated')void client.invalidateQueries({queryKey:['admin-media']})},()=>setStatus('live'));if(!stopped){setStatus('offline');reconnect=setTimeout(connect,2_000)}}catch(error){if(!stopped&&!(error instanceof DOMException&&error.name==='AbortError')){setStatus('offline');reconnect=setTimeout(connect,3_000)}}};void connect();return()=>{stopped=true;controller.abort();if(reconnect)clearTimeout(reconnect)}},[client,enabled]);
+  useEffect(()=>{if(!items.length)return;const timer=setTimeout(()=>setItems(current=>current.slice(0,-1)),7_000);return()=>clearTimeout(timer)},[items]);
+  if(!enabled)return null;
+  return <><div className="fixed bottom-5 left-5 z-[60] flex items-center gap-2 rounded-full border border-white/10 bg-[#17171b]/90 px-3 py-2 text-xs text-slate-400 shadow-xl backdrop-blur-xl"><span className={`h-2 w-2 rounded-full ${status==='live'?'bg-emerald-400':status==='connecting'?'animate-pulse bg-amber-400':'bg-red-400'}`}/>{status==='live'?'Live updates':status==='connecting'?'Connecting...':'Reconnecting...'}</div><div className="fixed right-5 top-20 z-[70] flex w-[min(24rem,calc(100vw-2.5rem))] flex-col gap-3" aria-live="polite">{items.map(item=><article className="rounded-2xl border border-white/10 bg-[#17171b]/95 p-4 shadow-2xl backdrop-blur-xl" key={item.id}><div className="flex items-start gap-3"><span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-accent shadow-[0_0_14px_rgba(41,151,255,.7)]"/><div><h2 className="text-sm font-semibold">{item.title}</h2><p className="mt-1 text-sm leading-6 text-slate-400">{item.message}</p><time className="mt-2 block text-xs text-slate-500">{new Date(item.createdAt).toLocaleTimeString()}</time></div></div></article>)}</div></>;
+}
