@@ -7,5 +7,10 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <section className="admin-shell">{children}<LiveNotifications /></section>;
+  return (
+    <section className="admin-shell">
+      {children}
+      <LiveNotifications />
+    </section>
+  );
 }
