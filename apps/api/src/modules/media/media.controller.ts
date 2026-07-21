@@ -1,3 +1,17 @@
-import type { RequestHandler } from 'express';import { env } from '../../config/env.js';import { AppError } from '../../lib/errors.js';import { signedDownload } from './media.storage.js';import { mediaService } from './media.service.js';
-const asyncHandler=(handler:RequestHandler):RequestHandler=>(req,res,next)=>Promise.resolve(handler(req,res,next)).catch(next);
-export const mediaController={upload:asyncHandler(async(req,res)=>{const asset=await mediaService.upload(req.file);res.status(202).json({data:asset})}),list:asyncHandler(async(_req,res)=>res.json({data:await mediaService.list()})),resume:asyncHandler(async(_req,res)=>{if(!env.R2_RESUME_KEY)throw new AppError(404,'Resume is not available','NOT_FOUND');res.setHeader('cache-control','no-store');res.json({data:{url:await signedDownload(env.R2_RESUME_KEY,'Akinode-Resume.pdf'),expiresIn:env.SIGNED_URL_TTL_SECONDS}})})};
+import type { RequestHandler } from 'express';
+import type { MediaService } from './media.service.js';
+const wrap =
+  (handler: RequestHandler): RequestHandler =>
+  (req, res, next) =>
+    Promise.resolve(handler(req, res, next)).catch(next);
+export class MediaController {
+  constructor(private readonly service: MediaService) {}
+  upload = wrap(async (req, res) =>
+    res.status(202).json({ data: await this.service.upload(req.file) }),
+  );
+  list = wrap(async (_req, res) => res.json({ data: await this.service.list() }));
+  resume = wrap(async (_req, res) => {
+    res.setHeader('cache-control', 'no-store');
+    res.json({ data: await this.service.resume() });
+  });
+}

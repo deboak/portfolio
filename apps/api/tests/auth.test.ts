@@ -11,8 +11,13 @@ describe('admin authentication boundary', () => {
   });
 
   it('accepts a valid short-lived access token', async () => {
-    const access = tokenService.access({ id: 'admin-test', email: 'admin@example.com' });
-    const response = await request(createApp()).get('/api/v1/auth/me').set('authorization', `Bearer ${access}`);
+    const access = tokenService.access({
+      id: 'admin-test',
+      email: 'admin@example.com',
+    });
+    const response = await request(createApp())
+      .get('/api/v1/auth/me')
+      .set('authorization', `Bearer ${access}`);
     expect(response.status).toBe(200);
     expect(response.body.data.admin.email).toBe('admin@example.com');
   });
