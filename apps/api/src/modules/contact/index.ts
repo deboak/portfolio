@@ -1,1 +1,1 @@
-export { contactRouter,adminContactRouter } from './contact.routes.js';
+export { contactRouter, adminContactRouter } from './contact.routes.js';

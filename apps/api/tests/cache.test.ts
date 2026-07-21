@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const redisMock = vi.hoisted(() => ({ get: vi.fn(), set: vi.fn(), scan: vi.fn(), del: vi.fn() }));
+const redisMock = vi.hoisted(() => ({
+  get: vi.fn(),
+  set: vi.fn(),
+  scan: vi.fn(),
+  del: vi.fn(),
+}));
 vi.mock('../src/lib/redis.js', () => ({ redis: redisMock }));
 import { cache } from '../src/lib/cache.js';
 
@@ -9,7 +14,9 @@ describe('cache utility', () => {
 
   it('deserializes cached values', async () => {
     redisMock.get.mockResolvedValue(JSON.stringify({ id: 'project-1' }));
-    await expect(cache.get('content:project:test')).resolves.toEqual({ id: 'project-1' });
+    await expect(cache.get('content:project:test')).resolves.toEqual({
+      id: 'project-1',
+    });
   });
 
   it('stores values with a TTL', async () => {

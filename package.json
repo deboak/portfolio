@@ -13,13 +13,16 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "lint": "npm run lint -w @portfolio/web",
+    "format:api": "prettier --write \"apps/api/{src,prisma,tests}/**/*.ts\"",
+    "format:api:check": "prettier --check \"apps/api/{src,prisma,tests}/**/*.ts\"",
     "db:generate": "npm run db:generate -w @portfolio/api",
     "db:migrate": "npm run db:migrate -w @portfolio/api",
     "db:seed": "npm run db:seed -w @portfolio/api"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "prettier": "^3.6.2"
   },
   "engines": {
     "node": ">=20"

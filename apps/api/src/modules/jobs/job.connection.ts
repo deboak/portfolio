@@ -4,6 +4,6 @@ import { env } from '../../config/env.js';
 export const jobConnection = new Redis(env.REDIS_URL, {
   lazyConnect: true,
   maxRetriesPerRequest: null,
-  enableReadyCheck: false
+  enableReadyCheck: false,
 });
-jobConnection.on('error', error => console.error('Job Redis connection error', error.message));
+jobConnection.on('error', (error) => console.error('Job Redis connection error', error.message));

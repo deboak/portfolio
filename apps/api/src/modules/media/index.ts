@@ -1,1 +1,1 @@
-export { mediaRouter,resumeRouter } from './media.routes.js';
+export { mediaRouter, resumeRouter } from './media.routes.js';

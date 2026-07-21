@@ -20,6 +20,8 @@ Admin access uses a 15-minute bearer access token plus a rotating refresh token 
 
 ## Backend modules
 
+Backend modules use constructor-based dependency injection. Repositories wrap data access, services contain business rules, and controllers translate HTTP requests and responses. Each `*.module.ts` file is the composition root that creates these classes and supplies their dependencies; route files only connect controller handlers to Express routes.
+
 Backend features are compartmentalized under `apps/api/src/modules`. Each module owns its routes, controller, service, repository, schemas, and public `index.ts` exports. The root `routes.ts` only composes feature routers; shared infrastructure such as Prisma, authentication middleware, validation, and error handling remains outside feature modules.
 
 Apply production migrations with `npx prisma migrate deploy --schema apps/api/prisma/schema.prisma`.
