@@ -1,3 +1,32 @@
-import { ContentCard } from '@/components/content-card';import { api } from '@/lib/api';
-export const metadata={title:'Blog'};export const revalidate=60;
-export default async function Blog(){const posts=await api.posts();return <><header className="pb-14 pt-10 sm:pt-16"><p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">Engineering journal</p><h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.05] tracking-[-.045em] sm:text-7xl">Notes from building <span className="text-slate-400">real systems.</span></h1><p className="mt-7 max-w-2xl text-lg leading-8 text-slate-400">Technical decisions, failures, discoveries, and practical lessons from the workbench.</p></header><section className="grid gap-6">{posts.map(post=><ContentCard key={post.id} href={`/blog/${post.slug}`} title={post.title} description={post.excerpt}/>)}</section></>}
+import { ContentCard } from '@/components/content-card';
+import { api } from '@/lib/api';
+export const metadata = { title: 'Blog' };
+export const dynamic = 'force-dynamic';
+export default async function Blog() {
+  const posts = await api.posts();
+  return (
+    <>
+      <header className="pb-14 pt-10 sm:pt-16">
+        <p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">
+          Engineering journal
+        </p>
+        <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.05] tracking-[-.045em] sm:text-7xl">
+          Notes from building <span className="text-slate-400">real systems.</span>
+        </h1>
+        <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-400">
+          Technical decisions, failures, discoveries, and practical lessons from the workbench.
+        </p>
+      </header>
+      <section className="grid gap-6">
+        {posts.map((post) => (
+          <ContentCard
+            key={post.id}
+            href={`/blog/${post.slug}`}
+            title={post.title}
+            description={post.excerpt}
+          />
+        ))}
+      </section>
+    </>
+  );
+}

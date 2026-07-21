@@ -5,48 +5,561 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { adminFetch, logout } from '@/lib/admin-api';
 
-type Project={id:string;title:string;slug:string;summary:string;description:string;technologies:string[];repositoryUrl:string|null;liveUrl:string|null;featured:boolean;published:boolean};
-type Post={id:string;title:string;slug:string;excerpt:string;content:string;published:boolean;publishedAt:string|null};
-type Stats={projects:{id:string;title:string;slug:string;viewCount:number}[];posts:{id:string;title:string;slug:string;viewCount:number}[]};
-type Media={id:string;originalKey:string;status:'PENDING'|'PROCESSING'|'READY'|'FAILED';variants:Record<string,string>|null;error:string|null};
-type Contact={id:string;name:string;email:string;subject:string;message:string;status:'PENDING'|'PROCESSING'|'DELIVERED'|'FAILED';error:string|null;createdAt:string};
-const emptyProject={title:'',slug:'',summary:'',description:'',technologies:'',repositoryUrl:'',liveUrl:'',featured:false,published:false};
-const emptyPost={title:'',slug:'',excerpt:'',content:'',published:false};
-const cleanProject=(x:Project):Project=>{
-  const value={title:x.title,slug:x.slug,summary:x.summary,description:x.description,technologies:x.technologies,repositoryUrl:x.repositoryUrl,liveUrl:x.liveUrl,featured:x.featured,published:x.published} as Project;
-  Object.defineProperty(value,'id',{value:x.id,enumerable:false});
+type Project = {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  description: string;
+  technologies: string[];
+  repositoryUrl: string | null;
+  liveUrl: string | null;
+  featured: boolean;
+  published: boolean;
+};
+type Post = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  published: boolean;
+  publishedAt: string | null;
+};
+type Stats = {
+  projects: { id: string; title: string; slug: string; viewCount: number }[];
+  posts: { id: string; title: string; slug: string; viewCount: number }[];
+};
+type Media = {
+  id: string;
+  originalKey: string;
+  status: 'PENDING' | 'PROCESSING' | 'READY' | 'FAILED';
+  variants: Record<string, string> | null;
+  error: string | null;
+};
+type Contact = {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: 'PENDING' | 'PROCESSING' | 'DELIVERED' | 'FAILED';
+  error: string | null;
+  createdAt: string;
+};
+const emptyProject = {
+  title: '',
+  slug: '',
+  summary: '',
+  description: '',
+  technologies: '',
+  repositoryUrl: '',
+  liveUrl: '',
+  featured: false,
+  published: false,
+};
+const emptyPost = { title: '', slug: '', excerpt: '', content: '', published: false };
+const cleanProject = (x: Project): Project => {
+  const value = {
+    title: x.title,
+    slug: x.slug,
+    summary: x.summary,
+    description: x.description,
+    technologies: x.technologies,
+    repositoryUrl: x.repositoryUrl,
+    liveUrl: x.liveUrl,
+    featured: x.featured,
+    published: x.published,
+  } as Project;
+  Object.defineProperty(value, 'id', { value: x.id, enumerable: false });
   return value;
 };
 
-export default function Admin(){
-  const router=useRouter(); const client=useQueryClient();
-  const me=useQuery({queryKey:['me'],queryFn:()=>adminFetch<{admin:{email:string}}>('/auth/me'),retry:false});
-  const projects=useQuery({queryKey:['admin-projects'],queryFn:()=>adminFetch<Project[]>('/admin/projects').then(items=>items.map(cleanProject)),enabled:me.isSuccess});
-  const posts=useQuery({queryKey:['admin-posts'],queryFn:()=>adminFetch<Post[]>('/admin/posts'),enabled:me.isSuccess});
-  const stats=useQuery({queryKey:['admin-stats'],queryFn:()=>adminFetch<Stats>('/admin/stats'),enabled:me.isSuccess});
-  const media=useQuery({queryKey:['admin-media'],queryFn:()=>adminFetch<Media[]>('/admin/media'),enabled:me.isSuccess});
-  const contacts=useQuery({queryKey:['admin-contacts'],queryFn:()=>adminFetch<Contact[]>('/admin/contacts'),enabled:me.isSuccess});
-  useEffect(()=>{if(me.isError)router.replace('/admin/login')},[me.isError,router]);
-  const mutate=useMutation({mutationFn:({path,method,body}:{path:string;method:string;body?:unknown})=>adminFetch(path,body===undefined?{method}:{method,body:JSON.stringify(body)}),onSuccess:()=>client.invalidateQueries({queryKey:['admin-projects']}).then(()=>client.invalidateQueries({queryKey:['admin-posts']}))});
-  if(me.isPending)return <p>Restoring secure session…</p>; if(me.isError)return null;
-  return <><nav className="card mb-8 flex flex-wrap items-center gap-2 text-sm"><Link className="rounded-lg px-3 py-2 hover:bg-white/10" href="/">Home</Link><Link className="rounded-lg bg-cyan-300/10 px-3 py-2 text-cyan-200" href="/admin">Dashboard</Link><a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#contacts">Contacts</a><a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#projects">Projects</a><a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#blog">Blog</a><a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#media">Media</a><Link className="rounded-lg px-3 py-2 hover:bg-white/10" href="/admin/admins">Administrators</Link></nav><div id="dashboard" className="flex scroll-mt-8 items-end justify-between"><div><p className="font-mono text-accent">{me.data.admin.email}</p><h1 className="mt-2 text-4xl font-bold">Admin dashboard</h1></div><button className="rounded-lg border border-white/20 px-4 py-2" onClick={async()=>{await logout();router.replace('/admin/login')}}>Log out</button></div>
-  <div className="mt-8 grid gap-4 sm:grid-cols-3"><div className="card"><p className="text-3xl font-bold">{projects.data?.length??'—'}</p><p className="text-slate-400">Projects</p></div><div className="card"><p className="text-3xl font-bold">{posts.data?.length??'—'}</p><p className="text-slate-400">Posts</p></div><div className="card"><p className="text-3xl font-bold">{contacts.data?.length??'—'}</p><p className="text-slate-400">Contact submissions</p></div></div>
-  <section className="mt-8 grid gap-4 md:grid-cols-2"><Top title="Top projects" items={stats.data?.projects??[]}/><Top title="Top posts" items={stats.data?.posts??[]}/></section>
-  <div id="contacts" className="scroll-mt-8"><ContactSubmissions items={contacts.data??[]} loading={contacts.isPending}/></div>
-  <div id="media" className="scroll-mt-8"><MediaManager items={media.data??[]} onUploaded={()=>client.invalidateQueries({queryKey:['admin-media']})}/></div>
-  {mutate.error&&<p className="mt-6 text-red-300">{mutate.error.message}</p>}
-  <div id="projects" className="scroll-mt-8"><ProjectManager items={projects.data??[]} run={(path,method,body)=>mutate.mutateAsync({path,method,body})}/></div>
-  <div id="blog" className="scroll-mt-8"><PostManager items={posts.data??[]} run={(path,method,body)=>mutate.mutateAsync({path,method,body})}/></div></>;
+export default function Admin() {
+  const router = useRouter();
+  const client = useQueryClient();
+  const me = useQuery({
+    queryKey: ['me'],
+    queryFn: () => adminFetch<{ admin: { email: string } }>('/auth/me'),
+    retry: false,
+  });
+  const projects = useQuery({
+    queryKey: ['admin-projects'],
+    queryFn: () =>
+      adminFetch<Project[]>('/admin/projects').then((items) => items.map(cleanProject)),
+    enabled: me.isSuccess,
+  });
+  const posts = useQuery({
+    queryKey: ['admin-posts'],
+    queryFn: () => adminFetch<Post[]>('/admin/posts'),
+    enabled: me.isSuccess,
+  });
+  const stats = useQuery({
+    queryKey: ['admin-stats'],
+    queryFn: () => adminFetch<Stats>('/admin/stats'),
+    enabled: me.isSuccess,
+  });
+  const media = useQuery({
+    queryKey: ['admin-media'],
+    queryFn: () => adminFetch<Media[]>('/admin/media'),
+    enabled: me.isSuccess,
+  });
+  const contacts = useQuery({
+    queryKey: ['admin-contacts'],
+    queryFn: () => adminFetch<Contact[]>('/admin/contacts'),
+    enabled: me.isSuccess,
+  });
+  useEffect(() => {
+    if (me.isError) router.replace('/admin/login');
+  }, [me.isError, router]);
+  const mutate = useMutation({
+    mutationFn: ({ path, method, body }: { path: string; method: string; body?: unknown }) =>
+      adminFetch(path, body === undefined ? { method } : { method, body: JSON.stringify(body) }),
+    onSuccess: () =>
+      client
+        .invalidateQueries({ queryKey: ['admin-projects'] })
+        .then(() => client.invalidateQueries({ queryKey: ['admin-posts'] })),
+  });
+  if (me.isPending) return <p>Restoring secure session…</p>;
+  if (me.isError) return null;
+  return (
+    <>
+      <nav className="card mb-8 flex flex-wrap items-center gap-2 text-sm">
+        <Link className="rounded-lg px-3 py-2 hover:bg-white/10" href="/">
+          Home
+        </Link>
+        <Link className="rounded-lg bg-cyan-300/10 px-3 py-2 text-cyan-200" href="/admin">
+          Dashboard
+        </Link>
+        <a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#contacts">
+          Contacts
+        </a>
+        <a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#projects">
+          Projects
+        </a>
+        <a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#blog">
+          Blog
+        </a>
+        <a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#media">
+          Media
+        </a>
+        <Link className="rounded-lg px-3 py-2 hover:bg-white/10" href="/admin/admins">
+          Administrators
+        </Link>
+      </nav>
+      <div id="dashboard" className="flex scroll-mt-8 items-end justify-between">
+        <div>
+          <p className="font-mono text-accent">{me.data.admin.email}</p>
+          <h1 className="mt-2 text-4xl font-bold">Admin dashboard</h1>
+        </div>
+        <button
+          className="rounded-lg border border-white/20 px-4 py-2"
+          onClick={async () => {
+            await logout();
+            router.replace('/admin/login');
+          }}
+        >
+          Log out
+        </button>
+      </div>
+      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        <div className="card">
+          <p className="text-3xl font-bold">{projects.data?.length ?? '—'}</p>
+          <p className="text-slate-400">Projects</p>
+        </div>
+        <div className="card">
+          <p className="text-3xl font-bold">{posts.data?.length ?? '—'}</p>
+          <p className="text-slate-400">Posts</p>
+        </div>
+        <div className="card">
+          <p className="text-3xl font-bold">{contacts.data?.length ?? '—'}</p>
+          <p className="text-slate-400">Contact submissions</p>
+        </div>
+      </div>
+      <section className="mt-8 grid gap-4 md:grid-cols-2">
+        <Top title="Top projects" items={stats.data?.projects ?? []} />
+        <Top title="Top posts" items={stats.data?.posts ?? []} />
+      </section>
+      <div id="contacts" className="scroll-mt-8">
+        <ContactSubmissions items={contacts.data ?? []} loading={contacts.isPending} />
+      </div>
+      <div id="media" className="scroll-mt-8">
+        <MediaManager
+          items={media.data ?? []}
+          onUploaded={() => client.invalidateQueries({ queryKey: ['admin-media'] })}
+        />
+      </div>
+      {mutate.error && <p className="mt-6 text-red-300">{mutate.error.message}</p>}
+      <div id="projects" className="scroll-mt-8">
+        <ProjectManager
+          items={projects.data ?? []}
+          run={(path, method, body) => mutate.mutateAsync({ path, method, body })}
+        />
+      </div>
+      <div id="blog" className="scroll-mt-8">
+        <PostManager
+          items={posts.data ?? []}
+          run={(path, method, body) => mutate.mutateAsync({ path, method, body })}
+        />
+      </div>
+    </>
+  );
 }
 
-function Top({title,items}:{title:string;items:{id:string;title:string;viewCount:number}[]}){return <div className="card"><h2 className="font-semibold text-accent">{title}</h2><ol className="mt-4 space-y-2">{items.map(item=><li className="flex justify-between" key={item.id}><span>{item.title}</span><span className="text-slate-400">{item.viewCount} views</span></li>)}{items.length===0&&<li className="text-slate-500">No views recorded yet.</li>}</ol></div>}
+function Top({
+  title,
+  items,
+}: {
+  title: string;
+  items: { id: string; title: string; viewCount: number }[];
+}) {
+  return (
+    <div className="card">
+      <h2 className="font-semibold text-accent">{title}</h2>
+      <ol className="mt-4 space-y-2">
+        {items.map((item) => (
+          <li className="flex justify-between" key={item.id}>
+            <span>{item.title}</span>
+            <span className="text-slate-400">{item.viewCount} views</span>
+          </li>
+        ))}
+        {items.length === 0 && <li className="text-slate-500">No views recorded yet.</li>}
+      </ol>
+    </div>
+  );
+}
 
-function ContactSubmissions({items,loading}:{items:Contact[];loading:boolean}){return <section className="mt-14"><div className="flex items-end justify-between"><div><h2 className="text-2xl font-bold">Contact submissions</h2><p className="mt-1 text-slate-400">Messages submitted through the public contact form.</p></div><span className="rounded-full bg-white/10 px-3 py-1 text-sm">{items.length}</span></div><div className="mt-5 space-y-4">{loading&&<div className="card text-slate-400">Loading submissions…</div>}{!loading&&items.length===0&&<div className="card text-slate-400">No contact submissions yet.</div>}{items.map(item=><article className="card" key={item.id}><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="text-lg font-semibold">{item.subject}</h3><p className="mt-1 text-sm text-slate-400">{item.name} · <a className="text-cyan-200 hover:underline" href={`mailto:${item.email}`}>{item.email}</a></p></div><div className="text-right"><Status value={item.status}/><time className="mt-2 block text-xs text-slate-500" dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleString()}</time></div></div><p className="mt-5 whitespace-pre-wrap leading-7 text-slate-300">{item.message}</p>{item.error&&<p className="mt-4 rounded-lg bg-red-500/10 p-3 text-sm text-red-300">Delivery error: {item.error}</p>}<a className="mt-5 inline-block rounded-lg border border-white/20 px-4 py-2 text-sm hover:border-cyan-300/50" href={`mailto:${item.email}?subject=${encodeURIComponent(`Re: ${item.subject}`)}`}>Reply by email</a></article>)}</div></section>}
+function ContactSubmissions({ items, loading }: { items: Contact[]; loading: boolean }) {
+  return (
+    <section className="mt-14">
+      <div className="flex items-end justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Contact submissions</h2>
+          <p className="mt-1 text-slate-400">Messages submitted through the public contact form.</p>
+        </div>
+        <span className="rounded-full bg-white/10 px-3 py-1 text-sm">{items.length}</span>
+      </div>
+      <div className="mt-5 space-y-4">
+        {loading && <div className="card text-slate-400">Loading submissions…</div>}
+        {!loading && items.length === 0 && (
+          <div className="card text-slate-400">No contact submissions yet.</div>
+        )}
+        {items.map((item) => (
+          <article className="card" key={item.id}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-semibold">{item.subject}</h3>
+                <p className="mt-1 text-sm text-slate-400">
+                  {item.name} ·{' '}
+                  <a className="text-cyan-200 hover:underline" href={`mailto:${item.email}`}>
+                    {item.email}
+                  </a>
+                </p>
+              </div>
+              <div className="text-right">
+                <Status value={item.status} />
+                <time className="mt-2 block text-xs text-slate-500" dateTime={item.createdAt}>
+                  {new Date(item.createdAt).toLocaleString()}
+                </time>
+              </div>
+            </div>
+            <p className="mt-5 whitespace-pre-wrap leading-7 text-slate-300">{item.message}</p>
+            {item.error && (
+              <p className="mt-4 rounded-lg bg-red-500/10 p-3 text-sm text-red-300">
+                Delivery error: {item.error}
+              </p>
+            )}
+            <a
+              className="mt-5 inline-block rounded-lg border border-white/20 px-4 py-2 text-sm hover:border-cyan-300/50"
+              href={`mailto:${item.email}?subject=${encodeURIComponent(`Re: ${item.subject}`)}`}
+            >
+              Reply by email
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
 
-function Status({value}:{value:Contact['status']}){const colors={PENDING:'bg-amber-400/10 text-amber-200',PROCESSING:'bg-blue-400/10 text-blue-200',DELIVERED:'bg-emerald-400/10 text-emerald-200',FAILED:'bg-red-400/10 text-red-200'};return <span className={`rounded-full px-3 py-1 text-xs font-semibold ${colors[value]}`}>{value.toLowerCase()}</span>}
+function Status({ value }: { value: Contact['status'] }) {
+  const colors = {
+    PENDING: 'bg-amber-400/10 text-amber-200',
+    PROCESSING: 'bg-blue-400/10 text-blue-200',
+    DELIVERED: 'bg-emerald-400/10 text-emerald-200',
+    FAILED: 'bg-red-400/10 text-red-200',
+  };
+  return (
+    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${colors[value]}`}>
+      {value.toLowerCase()}
+    </span>
+  );
+}
 
-function MediaManager({items,onUploaded}:{items:Media[];onUploaded:()=>Promise<unknown>}){const [file,setFile]=useState<File|null>(null);const upload=useMutation({mutationFn:async()=>{if(!file)throw new Error('Choose an image');const body=new FormData();body.append('image',file);return adminFetch<Media>('/admin/media',{method:'POST',body})},onSuccess:async()=>{setFile(null);await onUploaded()}});return <section className="mt-14"><h2 className="text-2xl font-bold">Media processing</h2><form className="card mt-5 flex flex-wrap items-center gap-4" onSubmit={e=>{e.preventDefault();upload.mutate()}}><input accept="image/jpeg,image/png,image/webp" type="file" onChange={e=>setFile(e.target.files?.[0]??null)}/><button disabled={!file||upload.isPending} className="rounded bg-accent px-4 py-2 font-semibold text-ink">{upload.isPending?'Uploading…':'Upload image'}</button>{upload.error&&<p className="text-red-300">{upload.error.message}</p>}</form><div className="mt-4 grid gap-3 sm:grid-cols-2">{items.map(item=><div className="card" key={item.id}><p className="font-mono text-sm text-accent">{item.status}</p><p className="mt-2 break-all text-sm text-slate-400">{item.originalKey}</p>{item.error&&<p className="mt-2 text-red-300">{item.error}</p>}</div>)}</div></section>}
+function MediaManager({
+  items,
+  onUploaded,
+}: {
+  items: Media[];
+  onUploaded: () => Promise<unknown>;
+}) {
+  const [file, setFile] = useState<File | null>(null);
+  const upload = useMutation({
+    mutationFn: async () => {
+      if (!file) throw new Error('Choose an image');
+      const body = new FormData();
+      body.append('image', file);
+      return adminFetch<Media>('/admin/media', { method: 'POST', body });
+    },
+    onSuccess: async () => {
+      setFile(null);
+      await onUploaded();
+    },
+  });
+  return (
+    <section className="mt-14">
+      <h2 className="text-2xl font-bold">Media processing</h2>
+      <form
+        className="card mt-5 flex flex-wrap items-center gap-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          upload.mutate();
+        }}
+      >
+        <input
+          accept="image/jpeg,image/png,image/webp"
+          type="file"
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        />
+        <button
+          disabled={!file || upload.isPending}
+          className="rounded bg-accent px-4 py-2 font-semibold text-ink"
+        >
+          {upload.isPending ? 'Uploading…' : 'Upload image'}
+        </button>
+        {upload.error && <p className="text-red-300">{upload.error.message}</p>}
+      </form>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {items.map((item) => (
+          <div className="card" key={item.id}>
+            <p className="font-mono text-sm text-accent">{item.status}</p>
+            <p className="mt-2 break-all text-sm text-slate-400">{item.originalKey}</p>
+            {item.error && <p className="mt-2 text-red-300">{item.error}</p>}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
-function ProjectManager({items,run}:{items:Project[];run:(p:string,m:string,b?:unknown)=>Promise<unknown>}){const [form,setForm]=useState(emptyProject);const set=(key:string,value:unknown)=>setForm(v=>({...v,[key]:value}));return <section className="mt-14"><h2 className="text-2xl font-bold">Projects</h2><form className="card mt-5 grid gap-3 md:grid-cols-2" onSubmit={async e=>{e.preventDefault();await run('/admin/projects','POST',{...form,technologies:form.technologies.split(',').map(v=>v.trim()).filter(Boolean),repositoryUrl:form.repositoryUrl||null,liveUrl:form.liveUrl||null});setForm(emptyProject)}}><input required minLength={2} placeholder="Title" value={form.title} onChange={e=>set('title',e.target.value)} className="rounded bg-black/30 p-3"/><input required pattern="[a-z0-9-]+" placeholder="slug" value={form.slug} onChange={e=>set('slug',e.target.value)} className="rounded bg-black/30 p-3"/><input required minLength={10} placeholder="Summary" value={form.summary} onChange={e=>set('summary',e.target.value)} className="rounded bg-black/30 p-3 md:col-span-2"/><textarea required minLength={20} placeholder="Description" value={form.description} onChange={e=>set('description',e.target.value)} className="rounded bg-black/30 p-3 md:col-span-2"/><input placeholder="Technologies, comma separated" value={form.technologies} onChange={e=>set('technologies',e.target.value)} className="rounded bg-black/30 p-3 md:col-span-2"/><label><input type="checkbox" checked={form.published} onChange={e=>set('published',e.target.checked)}/> Published</label><button className="rounded bg-accent p-2 font-semibold text-ink">Add project</button></form><div className="mt-5 space-y-3">{items.map(x=><div className="card flex items-center justify-between" key={x.id}><div><strong>{x.title}</strong><p className="text-sm text-slate-400">{x.published?'Published':'Draft'}</p></div><div className="flex gap-2"><button onClick={()=>run(`/admin/projects/${x.id}`,'PUT',{...x,published:!x.published})} className="rounded border border-white/20 px-3 py-2">{x.published?'Unpublish':'Publish'}</button><button onClick={()=>confirm('Delete this project?')&&run(`/admin/projects/${x.id}`,'DELETE')} className="rounded border border-red-400/40 px-3 py-2 text-red-300">Delete</button></div></div>)}</div></section>}
+function ProjectManager({
+  items,
+  run,
+}: {
+  items: Project[];
+  run: (p: string, m: string, b?: unknown) => Promise<unknown>;
+}) {
+  const [form, setForm] = useState(emptyProject);
+  const set = (key: string, value: unknown) => setForm((v) => ({ ...v, [key]: value }));
+  return (
+    <section className="mt-14">
+      <h2 className="text-2xl font-bold">Projects</h2>
+      <form
+        className="card mt-5 grid gap-3 md:grid-cols-2"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await run('/admin/projects', 'POST', {
+            ...form,
+            technologies: form.technologies
+              .split(',')
+              .map((v) => v.trim())
+              .filter(Boolean),
+            repositoryUrl: form.repositoryUrl || null,
+            liveUrl: form.liveUrl || null,
+          });
+          setForm(emptyProject);
+        }}
+      >
+        <input
+          required
+          minLength={2}
+          placeholder="Title"
+          value={form.title}
+          onChange={(e) => set('title', e.target.value)}
+          className="rounded bg-black/30 p-3"
+        />
+        <input
+          required
+          pattern="[a-z0-9-]+"
+          placeholder="slug"
+          value={form.slug}
+          onChange={(e) => set('slug', e.target.value)}
+          className="rounded bg-black/30 p-3"
+        />
+        <input
+          required
+          minLength={10}
+          placeholder="Summary"
+          value={form.summary}
+          onChange={(e) => set('summary', e.target.value)}
+          className="rounded bg-black/30 p-3 md:col-span-2"
+        />
+        <textarea
+          required
+          minLength={20}
+          placeholder="Description"
+          value={form.description}
+          onChange={(e) => set('description', e.target.value)}
+          className="rounded bg-black/30 p-3 md:col-span-2"
+        />
+        <input
+          placeholder="Technologies, comma separated"
+          value={form.technologies}
+          onChange={(e) => set('technologies', e.target.value)}
+          className="rounded bg-black/30 p-3 md:col-span-2"
+        />
+        <label>
+          <input
+            type="checkbox"
+            checked={form.published}
+            onChange={(e) => set('published', e.target.checked)}
+          />{' '}
+          Published
+        </label>
+        <button className="rounded bg-accent p-2 font-semibold text-ink">Add project</button>
+      </form>
+      <div className="mt-5 space-y-3">
+        {items.map((x) => (
+          <div className="card flex items-center justify-between" key={x.id}>
+            <div>
+              <strong>{x.title}</strong>
+              <p className="text-sm text-slate-400">{x.published ? 'Published' : 'Draft'}</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() =>
+                  run(`/admin/projects/${x.id}`, 'PUT', { ...x, published: !x.published })
+                }
+                className="rounded border border-white/20 px-3 py-2"
+              >
+                {x.published ? 'Unpublish' : 'Publish'}
+              </button>
+              <button
+                onClick={() =>
+                  confirm('Delete this project?') && run(`/admin/projects/${x.id}`, 'DELETE')
+                }
+                className="rounded border border-red-400/40 px-3 py-2 text-red-300"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
-function PostManager({items,run}:{items:Post[];run:(p:string,m:string,b?:unknown)=>Promise<unknown>}){const [form,setForm]=useState(emptyPost);const set=(key:string,value:unknown)=>setForm(v=>({...v,[key]:value}));return <section className="mt-14"><h2 className="text-2xl font-bold">Blog posts</h2><form className="card mt-5 grid gap-3 md:grid-cols-2" onSubmit={async e=>{e.preventDefault();await run('/admin/posts','POST',{...form,publishedAt:form.published?new Date().toISOString():null});setForm(emptyPost)}}><input required minLength={2} placeholder="Title" value={form.title} onChange={e=>set('title',e.target.value)} className="rounded bg-black/30 p-3"/><input required pattern="[a-z0-9-]+" placeholder="slug" value={form.slug} onChange={e=>set('slug',e.target.value)} className="rounded bg-black/30 p-3"/><input required minLength={10} placeholder="Excerpt" value={form.excerpt} onChange={e=>set('excerpt',e.target.value)} className="rounded bg-black/30 p-3 md:col-span-2"/><textarea required minLength={20} placeholder="Markdown content" value={form.content} onChange={e=>set('content',e.target.value)} className="min-h-40 rounded bg-black/30 p-3 md:col-span-2"/><label><input type="checkbox" checked={form.published} onChange={e=>set('published',e.target.checked)}/> Published</label><button className="rounded bg-accent p-2 font-semibold text-ink">Add post</button></form><div className="mt-5 space-y-3">{items.map(x=><div className="card flex items-center justify-between" key={x.id}><div><strong>{x.title}</strong><p className="text-sm text-slate-400">{x.published?'Published':'Draft'}</p></div><div className="flex gap-2"><button onClick={()=>run(`/admin/posts/${x.id}`,'PUT',{title:x.title,slug:x.slug,excerpt:x.excerpt,content:x.content,published:!x.published,publishedAt:!x.published?new Date().toISOString():null})} className="rounded border border-white/20 px-3 py-2">{x.published?'Unpublish':'Publish'}</button><button onClick={()=>confirm('Delete this post?')&&run(`/admin/posts/${x.id}`,'DELETE')} className="rounded border border-red-400/40 px-3 py-2 text-red-300">Delete</button></div></div>)}</div></section>}
+function PostManager({
+  items,
+  run,
+}: {
+  items: Post[];
+  run: (p: string, m: string, b?: unknown) => Promise<unknown>;
+}) {
+  const [form, setForm] = useState(emptyPost);
+  const set = (key: string, value: unknown) => setForm((v) => ({ ...v, [key]: value }));
+  return (
+    <section className="mt-14">
+      <h2 className="text-2xl font-bold">Blog posts</h2>
+      <form
+        className="card mt-5 grid gap-3 md:grid-cols-2"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await run('/admin/posts', 'POST', {
+            ...form,
+            publishedAt: form.published ? new Date().toISOString() : null,
+          });
+          setForm(emptyPost);
+        }}
+      >
+        <input
+          required
+          minLength={2}
+          placeholder="Title"
+          value={form.title}
+          onChange={(e) => set('title', e.target.value)}
+          className="rounded bg-black/30 p-3"
+        />
+        <input
+          required
+          pattern="[a-z0-9-]+"
+          placeholder="slug"
+          value={form.slug}
+          onChange={(e) => set('slug', e.target.value)}
+          className="rounded bg-black/30 p-3"
+        />
+        <input
+          required
+          minLength={10}
+          placeholder="Excerpt"
+          value={form.excerpt}
+          onChange={(e) => set('excerpt', e.target.value)}
+          className="rounded bg-black/30 p-3 md:col-span-2"
+        />
+        <textarea
+          required
+          minLength={20}
+          placeholder="Markdown content"
+          value={form.content}
+          onChange={(e) => set('content', e.target.value)}
+          className="min-h-40 rounded bg-black/30 p-3 md:col-span-2"
+        />
+        <label>
+          <input
+            type="checkbox"
+            checked={form.published}
+            onChange={(e) => set('published', e.target.checked)}
+          />{' '}
+          Published
+        </label>
+        <button className="rounded bg-accent p-2 font-semibold text-ink">Add post</button>
+      </form>
+      <div className="mt-5 space-y-3">
+        {items.map((x) => (
+          <div className="card flex items-center justify-between" key={x.id}>
+            <div>
+              <strong>{x.title}</strong>
+              <p className="text-sm text-slate-400">{x.published ? 'Published' : 'Draft'}</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() =>
+                  run(`/admin/posts/${x.id}`, 'PUT', {
+                    title: x.title,
+                    slug: x.slug,
+                    excerpt: x.excerpt,
+                    content: x.content,
+                    published: !x.published,
+                    publishedAt: !x.published ? new Date().toISOString() : null,
+                  })
+                }
+                className="rounded border border-white/20 px-3 py-2"
+              >
+                {x.published ? 'Unpublish' : 'Publish'}
+              </button>
+              <button
+                onClick={() =>
+                  confirm('Delete this post?') && run(`/admin/posts/${x.id}`, 'DELETE')
+                }
+                className="rounded border border-red-400/40 px-3 py-2 text-red-300"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
