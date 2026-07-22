@@ -32,6 +32,7 @@ export async function signedDownload(
   key: string,
   filename: string,
   disposition: 'inline' | 'attachment' = 'attachment',
+  contentType = 'application/pdf',
 ) {
   const { client, bucket } = r2();
   return getSignedUrl(
@@ -40,7 +41,7 @@ export async function signedDownload(
       Bucket: bucket,
       Key: key,
       ResponseContentDisposition: `${disposition}; filename="${filename}"`,
-      ResponseContentType: 'application/pdf',
+      ResponseContentType: contentType,
     }),
     { expiresIn: env.SIGNED_URL_TTL_SECONDS },
   );

@@ -9,10 +9,14 @@ export class ProjectRepository {
       orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
       take: page.limit + 1,
       ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
+      include: { mediaAsset: true },
     });
   }
   bySlug(slug: string) {
-    return this.prisma.project.findFirst({ where: { slug, published: true } });
+    return this.prisma.project.findFirst({
+      where: { slug, published: true },
+      include: { mediaAsset: true },
+    });
   }
   create(data: ProjectInput) {
     return this.prisma.project.create({
@@ -20,6 +24,7 @@ export class ProjectRepository {
         ...data,
         repositoryUrl: data.repositoryUrl ?? null,
         liveUrl: data.liveUrl ?? null,
+        mediaAssetId: data.mediaAssetId ?? null,
       },
     });
   }
@@ -30,6 +35,7 @@ export class ProjectRepository {
         ...data,
         repositoryUrl: data.repositoryUrl ?? null,
         liveUrl: data.liveUrl ?? null,
+        mediaAssetId: data.mediaAssetId ?? null,
       },
     });
   }

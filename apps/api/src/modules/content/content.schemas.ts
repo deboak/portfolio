@@ -24,6 +24,7 @@ export const projectInput = z.object({
       technologies: z.array(z.string().trim().min(1)).max(20),
       repositoryUrl: z.string().url().nullable().optional(),
       liveUrl: z.string().url().nullable().optional(),
+      mediaAssetId: z.string().cuid().nullable().optional(),
       featured: z.boolean().default(false),
       published: z.boolean().default(false),
     })

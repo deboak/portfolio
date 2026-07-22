@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { api } from '@/lib/api';
+import { api, mediaUrl } from '@/lib/api';
 export default async function Project({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const project = await api.project(slug);
@@ -9,13 +9,36 @@ export default async function Project({ params }: { params: Promise<{ slug: stri
         ← All projects
       </Link>
       <header className="border-b border-black/10 pb-14 pt-10">
-        <p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">
-          Project case study
-        </p>
-        <h1 className="mt-5 max-w-4xl text-5xl font-semibold tracking-[-.045em] sm:text-7xl">
-          {project.title}
-        </h1>
-        <p className="mt-7 max-w-3xl text-xl leading-9 text-slate-400">{project.summary}</p>
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,.8fr)]">
+          <div className="order-2 lg:order-1">
+            <p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">
+              Project case study
+            </p>
+            <h1 className="mt-5 text-5xl font-semibold tracking-[-.045em] sm:text-7xl">
+              {project.title}
+            </h1>
+            <p className="mt-7 max-w-3xl text-xl leading-9 text-slate-400">{project.summary}</p>
+          </div>
+          {project.mediaAsset?.status === 'READY' && (
+            <div className="order-1 overflow-hidden rounded-3xl bg-black/5 shadow-soft lg:order-2">
+              {project.mediaAsset.contentType.startsWith('video/') ? (
+                <video
+                  className="aspect-square w-full object-cover"
+                  src={mediaUrl(project.mediaAsset.id)}
+                  controls
+                  playsInline
+                  preload="metadata"
+                />
+              ) : (
+                <img
+                  className="aspect-square w-full object-cover"
+                  src={mediaUrl(project.mediaAsset.id)}
+                  alt={`${project.title} project preview`}
+                />
+              )}
+            </div>
+          )}
+        </div>
       </header>
       <div className="grid gap-12 py-14 lg:grid-cols-[1fr_18rem]">
         <section>

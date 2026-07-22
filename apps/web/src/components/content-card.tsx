@@ -5,17 +5,35 @@ export function ContentCard({
   title,
   description,
   tags = [],
+  media,
 }: {
   href: string;
   title: string;
   description: string;
   tags?: string[];
+  media?: { url: string; type: string } | undefined;
 }) {
   return (
     <Link
       href={href}
       className="group flex min-h-72 flex-col rounded-[2rem] border border-black/5 bg-white p-8 shadow-[0_12px_40px_rgba(0,0,0,.045)] hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,.09)]"
     >
+      {media &&
+        (media.type.startsWith('video/') ? (
+          <video
+            className="mb-7 aspect-video w-full rounded-2xl object-cover"
+            src={media.url}
+            muted
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <img
+            className="mb-7 aspect-video w-full rounded-2xl object-cover"
+            src={media.url}
+            alt=""
+          />
+        ))}
       <div className="flex items-start justify-between gap-6">
         <span className="text-xs font-semibold uppercase tracking-[.18em] text-accent">
           Case study
