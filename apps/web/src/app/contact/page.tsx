@@ -26,7 +26,7 @@ export default function Contact() {
     <>
       <header className="pb-14 pt-10 sm:pt-16">
         <p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">Contact</p>
-        <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.05] tracking-[-.045em] sm:text-7xl">
+        <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-[1.1] tracking-[-.04em] sm:text-7xl">
           Let's make something <span className="text-slate-400">worth using.</span>
         </h1>
       </header>

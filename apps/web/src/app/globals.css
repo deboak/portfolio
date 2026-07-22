@@ -78,6 +78,7 @@ a {
 .prose p {
   @apply my-4 leading-8;
   color: #c7c7cc;
+  text-align: justify;
 }
 .prose a {
   color: var(--accent);

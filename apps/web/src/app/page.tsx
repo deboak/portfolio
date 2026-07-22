@@ -13,7 +13,7 @@ export default function Home() {
         <p className="mb-5 text-sm font-semibold uppercase tracking-[.22em] text-accent">
           Full-stack engineer
         </p>
-        <h1 className="mx-auto max-w-5xl text-5xl font-semibold leading-[1.04] tracking-[-.045em] sm:text-7xl lg:text-[5.4rem]">
+        <h1 className="mx-auto max-w-5xl text-4xl font-semibold leading-[1.08] tracking-[-.04em] sm:text-7xl lg:text-[5.4rem]">
           Thoughtful products.
           <br />
           <span className="text-slate-400">Reliable systems.</span>
@@ -51,7 +51,7 @@ export default function Home() {
       <section className="py-24">
         <div className="mb-10 max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-[.18em] text-accent">How I work</p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-[-.035em] sm:text-5xl">
+          <h2 className="mt-4 text-3xl font-semibold tracking-[-.035em] sm:text-5xl">
             Technology should feel simple.
           </h2>
         </div>
