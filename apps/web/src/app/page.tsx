@@ -37,14 +37,14 @@ export default function Home() {
           </Link>
         </div>
       </section>
-      <section className="relative overflow-hidden rounded-[2.5rem] bg-white shadow-soft">
+      <section className="relative mx-auto aspect-square w-full max-w-lg overflow-hidden rounded-[2.5rem] bg-white shadow-soft">
         <Image
-          src="/images/developer-at-work.png"
-          alt="Software engineer working on a laptop in a calm studio"
-          width={1536}
-          height={1024}
+          src="/images/akinode-portrait.png"
+          alt="Akinode in a black suit"
+          width={1254}
+          height={1254}
           priority
-          className="h-auto w-full"
+          className="h-full w-full object-cover"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
       </section>
@@ -64,24 +64,6 @@ export default function Home() {
             </article>
           ))}
         </div>
-      </section>
-      <section className="mb-8 rounded-[2.5rem] bg-ink px-7 py-16 text-center text-white sm:px-14">
-        <p className="text-sm font-semibold uppercase tracking-[.18em] text-blue-300">
-          Private access
-        </p>
-        <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-          Manage the portfolio.
-        </h2>
-        <p className="mx-auto mt-4 max-w-lg text-slate-300">
-          Content, messages, analytics, and background media processing live in one protected
-          workspace.
-        </p>
-        <Link
-          href="/admin/login"
-          className="mt-8 inline-block rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink hover:-translate-y-0.5"
-        >
-          Admin login
-        </Link>
       </section>
     </>
   );

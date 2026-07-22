@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@prisma/client';
-import type { ListQuery, PostInput, ProjectInput } from './content.schemas.js';
+import type { AboutInput, ListQuery, PostInput, ProjectInput } from './content.schemas.js';
 
 export class ProjectRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -69,5 +69,21 @@ export class PostRepository {
   }
   remove(id: string) {
     return this.prisma.post.delete({ where: { id } });
+  }
+}
+
+export class AboutRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  get() {
+    return this.prisma.aboutContent.findUnique({ where: { id: 'main' } });
+  }
+
+  save(data: AboutInput) {
+    return this.prisma.aboutContent.upsert({
+      where: { id: 'main' },
+      create: { id: 'main', ...data },
+      update: data,
+    });
   }
 }

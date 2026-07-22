@@ -106,3 +106,20 @@ model MediaAsset {
 
   @@index([status, createdAt(sort: Desc)])
 }
+
+model AboutContent {
+  id              String   @id @default("main")
+  eyebrow         String   @default("About")
+  title           String
+  introTitle      String
+  intro           String
+  body            String
+  valueOneTitle   String
+  valueOneText    String
+  valueTwoTitle   String
+  valueTwoText    String
+  valueThreeTitle String
+  valueThreeText  String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

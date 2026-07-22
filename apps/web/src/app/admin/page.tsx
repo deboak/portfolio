@@ -1,8 +1,8 @@
 'use client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { AdminNavigation } from '@/components/admin-navigation';
 import { adminFetch, logout } from '@/lib/admin-api';
 
 type Project = {
@@ -29,6 +29,7 @@ type Post = {
 type Stats = {
   projects: { id: string; title: string; slug: string; viewCount: number }[];
   posts: { id: string; title: string; slug: string; viewCount: number }[];
+  contactCount: number;
 };
 type Media = {
   id: string;
@@ -36,16 +37,6 @@ type Media = {
   status: 'PENDING' | 'PROCESSING' | 'READY' | 'FAILED';
   variants: Record<string, string> | null;
   error: string | null;
-};
-type Contact = {
-  id: string;
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  status: 'PENDING' | 'PROCESSING' | 'DELIVERED' | 'FAILED';
-  error: string | null;
-  createdAt: string;
 };
 const emptyProject = {
   title: '',
@@ -104,11 +95,6 @@ export default function Admin() {
     queryFn: () => adminFetch<Media[]>('/admin/media'),
     enabled: me.isSuccess,
   });
-  const contacts = useQuery({
-    queryKey: ['admin-contacts'],
-    queryFn: () => adminFetch<Contact[]>('/admin/contacts'),
-    enabled: me.isSuccess,
-  });
   useEffect(() => {
     if (me.isError) router.replace('/admin/login');
   }, [me.isError, router]);
@@ -124,29 +110,7 @@ export default function Admin() {
   if (me.isError) return null;
   return (
     <>
-      <nav className="card mb-8 flex flex-wrap items-center gap-2 text-sm">
-        <Link className="rounded-lg px-3 py-2 hover:bg-white/10" href="/">
-          Home
-        </Link>
-        <Link className="rounded-lg bg-cyan-300/10 px-3 py-2 text-cyan-200" href="/admin">
-          Dashboard
-        </Link>
-        <a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#contacts">
-          Contacts
-        </a>
-        <a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#projects">
-          Projects
-        </a>
-        <a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#blog">
-          Blog
-        </a>
-        <a className="rounded-lg px-3 py-2 hover:bg-white/10" href="#media">
-          Media
-        </a>
-        <Link className="rounded-lg px-3 py-2 hover:bg-white/10" href="/admin/admins">
-          Administrators
-        </Link>
-      </nav>
+      <AdminNavigation />
       <div id="dashboard" className="flex scroll-mt-8 items-end justify-between">
         <div>
           <p className="font-mono text-accent">{me.data.admin.email}</p>
@@ -172,7 +136,7 @@ export default function Admin() {
           <p className="text-slate-400">Posts</p>
         </div>
         <div className="card">
-          <p className="text-3xl font-bold">{contacts.data?.length ?? '—'}</p>
+          <p className="text-3xl font-bold">{stats.data?.contactCount ?? '—'}</p>
           <p className="text-slate-400">Contact submissions</p>
         </div>
       </div>
@@ -180,9 +144,6 @@ export default function Admin() {
         <Top title="Top projects" items={stats.data?.projects ?? []} />
         <Top title="Top posts" items={stats.data?.posts ?? []} />
       </section>
-      <div id="contacts" className="scroll-mt-8">
-        <ContactSubmissions items={contacts.data ?? []} loading={contacts.isPending} />
-      </div>
       <div id="media" className="scroll-mt-8">
         <MediaManager
           items={media.data ?? []}
@@ -229,73 +190,6 @@ function Top({
   );
 }
 
-function ContactSubmissions({ items, loading }: { items: Contact[]; loading: boolean }) {
-  return (
-    <section className="mt-14">
-      <div className="flex items-end justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Contact submissions</h2>
-          <p className="mt-1 text-slate-400">Messages submitted through the public contact form.</p>
-        </div>
-        <span className="rounded-full bg-white/10 px-3 py-1 text-sm">{items.length}</span>
-      </div>
-      <div className="mt-5 space-y-4">
-        {loading && <div className="card text-slate-400">Loading submissions…</div>}
-        {!loading && items.length === 0 && (
-          <div className="card text-slate-400">No contact submissions yet.</div>
-        )}
-        {items.map((item) => (
-          <article className="card" key={item.id}>
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h3 className="text-lg font-semibold">{item.subject}</h3>
-                <p className="mt-1 text-sm text-slate-400">
-                  {item.name} ·{' '}
-                  <a className="text-cyan-200 hover:underline" href={`mailto:${item.email}`}>
-                    {item.email}
-                  </a>
-                </p>
-              </div>
-              <div className="text-right">
-                <Status value={item.status} />
-                <time className="mt-2 block text-xs text-slate-500" dateTime={item.createdAt}>
-                  {new Date(item.createdAt).toLocaleString()}
-                </time>
-              </div>
-            </div>
-            <p className="mt-5 whitespace-pre-wrap leading-7 text-slate-300">{item.message}</p>
-            {item.error && (
-              <p className="mt-4 rounded-lg bg-red-500/10 p-3 text-sm text-red-300">
-                Delivery error: {item.error}
-              </p>
-            )}
-            <a
-              className="mt-5 inline-block rounded-lg border border-white/20 px-4 py-2 text-sm hover:border-cyan-300/50"
-              href={`mailto:${item.email}?subject=${encodeURIComponent(`Re: ${item.subject}`)}`}
-            >
-              Reply by email
-            </a>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function Status({ value }: { value: Contact['status'] }) {
-  const colors = {
-    PENDING: 'bg-amber-400/10 text-amber-200',
-    PROCESSING: 'bg-blue-400/10 text-blue-200',
-    DELIVERED: 'bg-emerald-400/10 text-emerald-200',
-    FAILED: 'bg-red-400/10 text-red-200',
-  };
-  return (
-    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${colors[value]}`}>
-      {value.toLowerCase()}
-    </span>
-  );
-}
-
 function MediaManager({
   items,
   onUploaded,
@@ -319,6 +213,10 @@ function MediaManager({
   return (
     <section className="mt-14">
       <h2 className="text-2xl font-bold">Media processing</h2>
+      <p className="mt-2 max-w-3xl text-slate-400">
+        Originals and generated image variants are stored in your private Cloudflare R2 bucket. The
+        database keeps their R2 object keys and processing status.
+      </p>
       <form
         className="card mt-5 flex flex-wrap items-center gap-4"
         onSubmit={(e) => {

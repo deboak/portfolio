@@ -1,17 +1,33 @@
 import type { cache } from '../../lib/cache.js';
 import { AppError } from '../../lib/errors.js';
-import type { PostRepository, ProjectRepository } from './content.repository.js';
-import type { ListQuery, PostInput, ProjectInput } from './content.schemas.js';
+import type { AboutRepository, PostRepository, ProjectRepository } from './content.repository.js';
+import type { AboutInput, ListQuery, PostInput, ProjectInput } from './content.schemas.js';
 const keys = {
   projects: 'content:projects',
   posts: 'content:posts',
   project: (slug: string) => `content:project:${slug}`,
   post: (slug: string) => `content:post:${slug}`,
+  about: 'content:about',
+};
+const defaultAbout: AboutInput = {
+  eyebrow: 'About',
+  title: 'Engineering with clarity, care, and curiosity.',
+  introTitle: 'Hello, I’m Akinode.',
+  intro:
+    'I’m a full-stack engineer who turns ambiguous product needs into clear interfaces and dependable backend systems. I care about the details users feel and the infrastructure they never have to think about.',
+  body: 'This portfolio is also a working engineering laboratory—where caching, queues, authentication, observability, and cloud storage are treated as real product concerns rather than afterthoughts.',
+  valueOneTitle: 'Product thinking',
+  valueOneText: 'Start with the outcome, then choose the technology.',
+  valueTwoTitle: 'Backend depth',
+  valueTwoText: 'Design for failure, visibility, and maintainable growth.',
+  valueThreeTitle: 'Continuous learning',
+  valueThreeText: 'Document decisions and turn mistakes into reusable knowledge.',
 };
 export class ContentService {
   constructor(
     private readonly projectsRepository: ProjectRepository,
     private readonly postsRepository: PostRepository,
+    private readonly aboutRepository: AboutRepository,
     private readonly cacheStore: typeof cache,
   ) {}
   private async required<T>(value: Promise<T | null>) {
@@ -88,6 +104,16 @@ export class ContentService {
   async deletePost(id: string) {
     const value = await this.postsRepository.remove(id);
     await this.invalidatePosts();
+    return value;
+  }
+
+  about() {
+    return this.cached(keys.about, async () => (await this.aboutRepository.get()) ?? defaultAbout);
+  }
+
+  async updateAbout(data: AboutInput) {
+    const value = await this.aboutRepository.save(data);
+    await this.cacheStore.deleteByPrefix(keys.about);
     return value;
   }
 }

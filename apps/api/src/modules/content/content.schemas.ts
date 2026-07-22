@@ -43,6 +43,25 @@ export const postInput = z.object({
     .strict(),
 });
 
+export const aboutInput = z.object({
+  body: z
+    .object({
+      eyebrow: z.string().trim().min(2).max(40),
+      title: z.string().trim().min(10).max(180),
+      introTitle: z.string().trim().min(2).max(100),
+      intro: z.string().trim().min(20).max(1_500),
+      body: z.string().trim().min(20).max(3_000),
+      valueOneTitle: z.string().trim().min(2).max(80),
+      valueOneText: z.string().trim().min(10).max(300),
+      valueTwoTitle: z.string().trim().min(2).max(80),
+      valueTwoText: z.string().trim().min(10).max(300),
+      valueThreeTitle: z.string().trim().min(2).max(80),
+      valueThreeText: z.string().trim().min(10).max(300),
+    })
+    .strict(),
+});
+
 export type ProjectInput = z.infer<typeof projectInput>['body'];
 export type PostInput = z.infer<typeof postInput>['body'];
+export type AboutInput = z.infer<typeof aboutInput>['body'];
 export type ListQuery = z.infer<typeof listQuery>['query'];

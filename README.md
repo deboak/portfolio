@@ -16,6 +16,8 @@ Open `http://localhost:3001`; API health is at `http://localhost:4000/api/v1/hea
 
 Set `ADMIN_EMAIL` and a password of at least 12 characters before running `npm run db:seed`. Open `http://localhost:3001/admin/login` and sign in with those credentials.
 
+Contact submissions live in a paginated inbox at `/admin/contacts`; selecting a message opens its dedicated detail and reply page. The public About page is editable at `/admin/about`, with its content stored in PostgreSQL and cached briefly for public reads. Media uploads go directly to the private Cloudflare R2 bucket configured by `R2_BUCKET`; PostgreSQL stores only the object keys, variants, and processing status.
+
 Admin access uses a 15-minute bearer access token plus a rotating refresh token in a secure, httpOnly cookie. Writes also require a CSRF token. Five failed password attempts lock the account for 15 minutes, while the IP limiter permits ten login attempts per 15-minute window. In production, configure unique 32+ character `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` values.
 
 ## Backend modules

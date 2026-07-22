@@ -2,7 +2,7 @@ import type { Queue } from 'bullmq';
 import { AppError } from '../../lib/errors.js';
 import type { AdminNotification } from '../notifications/index.js';
 import type { ContactRepository } from './contact.repository.js';
-import type { ContactInput } from './contact.schemas.js';
+import type { ContactInput, ContactListQuery } from './contact.schemas.js';
 
 type Notifier = (notification: AdminNotification) => Promise<void>;
 
@@ -50,7 +50,23 @@ export class ContactService {
     }
   }
 
-  list() {
-    return this.repository.list();
+  async list(page: ContactListQuery) {
+    const { items, total } = await this.repository.list(page);
+    const hasMore = items.length > page.limit;
+    const data = hasMore ? items.slice(0, page.limit) : items;
+    return {
+      items: data,
+      meta: {
+        total,
+        limit: page.limit,
+        nextCursor: hasMore ? data.at(-1)!.id : null,
+      },
+    };
+  }
+
+  async get(id: string) {
+    const item = await this.repository.get(id);
+    if (!item) throw new AppError(404, 'Contact submission not found', 'NOT_FOUND');
+    return item;
   }
 }
