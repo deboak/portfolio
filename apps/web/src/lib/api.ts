@@ -7,6 +7,8 @@ export type Project = {
   technologies: string[];
   repositoryUrl: string | null;
   liveUrl: string | null;
+  mediaAssetId: string | null;
+  mediaAsset: { id: string; contentType: string; status: string } | null;
   featured: boolean;
 };
 export type Post = {
@@ -32,6 +34,7 @@ export type AboutContent = {
 };
 const baseUrl =
   process.env.INTERNAL_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
+export const mediaUrl = (id: string) => `${baseUrl}/media/${id}`;
 async function get<T>(path: string): Promise<T> {
   const response = await fetch(`${baseUrl}${path}`, { next: { revalidate: 60 } });
   if (!response.ok) throw new Error(`API request failed: ${response.status}`);

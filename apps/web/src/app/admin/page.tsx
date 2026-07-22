@@ -14,6 +14,8 @@ type Project = {
   technologies: string[];
   repositoryUrl: string | null;
   liveUrl: string | null;
+  mediaAssetId: string | null;
+  mediaAsset: Media | null;
   featured: boolean;
   published: boolean;
 };
@@ -46,6 +48,7 @@ const emptyProject = {
   technologies: '',
   repositoryUrl: '',
   liveUrl: '',
+  mediaAssetId: null as string | null,
   featured: false,
   published: false,
 };
@@ -59,6 +62,7 @@ const cleanProject = (x: Project): Project => {
     technologies: x.technologies,
     repositoryUrl: x.repositoryUrl,
     liveUrl: x.liveUrl,
+    mediaAssetId: x.mediaAssetId,
     featured: x.featured,
     published: x.published,
   } as Project;
@@ -200,9 +204,9 @@ function MediaManager({
   const [file, setFile] = useState<File | null>(null);
   const upload = useMutation({
     mutationFn: async () => {
-      if (!file) throw new Error('Choose an image');
+      if (!file) throw new Error('Choose an image or video');
       const body = new FormData();
-      body.append('image', file);
+      body.append('media', file);
       return adminFetch<Media>('/admin/media', { method: 'POST', body });
     },
     onSuccess: async () => {
@@ -225,7 +229,7 @@ function MediaManager({
         }}
       >
         <input
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
           type="file"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
         />
@@ -258,6 +262,7 @@ function ProjectManager({
   run: (p: string, m: string, b?: unknown) => Promise<unknown>;
 }) {
   const [form, setForm] = useState(emptyProject);
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
   const set = (key: string, value: unknown) => setForm((v) => ({ ...v, [key]: value }));
   return (
     <section className="mt-14">
@@ -266,8 +271,19 @@ function ProjectManager({
         className="card mt-5 grid gap-3 md:grid-cols-2"
         onSubmit={async (e) => {
           e.preventDefault();
+          let mediaAssetId = form.mediaAssetId;
+          if (mediaFile) {
+            const uploadBody = new FormData();
+            uploadBody.append('media', mediaFile);
+            const asset = await adminFetch<Media>('/admin/media', {
+              method: 'POST',
+              body: uploadBody,
+            });
+            mediaAssetId = asset.id;
+          }
           await run('/admin/projects', 'POST', {
             ...form,
+            mediaAssetId,
             technologies: form.technologies
               .split(',')
               .map((v) => v.trim())
@@ -276,6 +292,7 @@ function ProjectManager({
             liveUrl: form.liveUrl || null,
           });
           setForm(emptyProject);
+          setMediaFile(null);
         }}
       >
         <input
@@ -330,6 +347,17 @@ function ProjectManager({
           onChange={(e) => set('repositoryUrl', e.target.value)}
           className="rounded bg-black/30 p-3"
         />
+        <label className="rounded bg-black/30 p-3 md:col-span-2">
+          <span className="mb-2 block text-sm text-slate-400">Project image or video</span>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
+            onChange={(e) => setMediaFile(e.target.files?.[0] ?? null)}
+          />
+          <span className="mt-2 block text-xs text-slate-500">
+            JPEG, PNG, WebP, MP4, or WebM. Maximum 50 MB.
+          </span>
+        </label>
         <label>
           <input
             type="checkbox"

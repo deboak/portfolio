@@ -10,6 +10,9 @@ export class MediaController {
     res.status(202).json({ data: await this.service.upload(req.file) }),
   );
   list = wrap(async (_req, res) => res.json({ data: await this.service.list() }));
+  view = wrap(async (req, res) =>
+    res.redirect(302, await this.service.view(req.params.id as string)),
+  );
   resume = wrap(async (_req, res) => {
     res.setHeader('cache-control', 'no-store');
     res.json({ data: await this.service.resume() });

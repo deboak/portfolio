@@ -1,5 +1,5 @@
 import { ContentCard } from '@/components/content-card';
-import { api } from '@/lib/api';
+import { api, mediaUrl } from '@/lib/api';
 export const metadata = { title: 'Projects' };
 export const dynamic = 'force-dynamic';
 export default async function Projects() {
@@ -24,6 +24,14 @@ export default async function Projects() {
               title={project.title}
               description={project.summary}
               tags={project.technologies}
+              media={
+                project.mediaAsset?.status === 'READY'
+                  ? {
+                      url: mediaUrl(project.mediaAsset.id),
+                      type: project.mediaAsset.contentType,
+                    }
+                  : undefined
+              }
             />
           ))}
         </section>
