@@ -9,11 +9,11 @@ export default function Home() {
   ];
   return (
     <>
-      <section className="pb-14 pt-16 text-center sm:pt-24">
+      <section className="pb-10 pt-10 text-center sm:pb-14 sm:pt-24">
         <p className="mb-5 text-sm font-semibold uppercase tracking-[.22em] text-accent">
           Full-stack engineer
         </p>
-        <h1 className="mx-auto max-w-5xl text-4xl font-semibold leading-[1.08] tracking-[-.04em] sm:text-7xl lg:text-[5.4rem]">
+        <h1 className="mx-auto max-w-5xl text-3xl font-semibold leading-[1.1] tracking-[-.035em] sm:text-5xl md:text-7xl lg:text-[5.4rem]">
           Thoughtful products.
           <br />
           <span className="text-slate-400">Reliable systems.</span>
@@ -48,10 +48,10 @@ export default function Home() {
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
       </section>
-      <section className="py-24">
+      <section className="py-14 sm:py-24">
         <div className="mb-10 max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-[.18em] text-accent">How I work</p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-[-.035em] sm:text-5xl">
+          <h2 className="mt-4 text-2xl font-semibold tracking-[-.03em] sm:text-5xl">
             Technology should feel simple.
           </h2>
         </div>

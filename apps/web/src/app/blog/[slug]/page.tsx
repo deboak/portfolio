@@ -14,7 +14,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
         <p className="text-sm font-semibold uppercase tracking-[.18em] text-accent">
           {post.publishedAt ? format.format(new Date(post.publishedAt)) : 'Draft'}
         </p>
-        <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-[-.04em] sm:text-6xl">
+        <h1 className="mt-4 break-words text-3xl font-semibold leading-tight tracking-[-.035em] sm:mt-5 sm:text-5xl md:text-6xl">
           {post.title}
         </h1>
         <p className="mt-6 text-xl leading-8 text-slate-400">{post.excerpt}</p>

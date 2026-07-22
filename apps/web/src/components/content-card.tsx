@@ -16,12 +16,12 @@ export function ContentCard({
   return (
     <Link
       href={href}
-      className="group flex min-h-72 flex-col rounded-[2rem] border border-black/5 bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,.045)] hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,.09)] sm:p-8"
+      className="group flex min-h-0 flex-col rounded-[1.5rem] border border-black/5 bg-white p-4 shadow-[0_12px_40px_rgba(0,0,0,.045)] hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,.09)] sm:min-h-72 sm:rounded-[2rem] sm:p-8"
     >
       {media &&
         (media.type.startsWith('video/') ? (
           <video
-            className="mb-7 aspect-video w-full rounded-2xl object-cover"
+            className="mb-6 aspect-video w-full rounded-2xl bg-black/5 object-contain"
             src={media.url}
             muted
             playsInline
@@ -29,7 +29,7 @@ export function ContentCard({
           />
         ) : (
           <img
-            className="mb-7 aspect-video w-full rounded-2xl object-cover"
+            className="mb-6 aspect-video w-full rounded-2xl bg-black/5 object-contain"
             src={media.url}
             alt=""
           />
@@ -42,9 +42,9 @@ export function ContentCard({
           →
         </span>
       </div>
-      <div className="mt-auto pt-16">
+      <div className={`mt-auto ${media ? 'pt-6' : 'pt-10 sm:pt-16'}`}>
         <h2 className="text-2xl font-semibold tracking-[-.025em]">{title}</h2>
-        <p className="mt-3 max-w-xl text-justify leading-7 text-slate-400">{description}</p>
+        <p className="mt-3 max-w-xl text-pretty leading-7 text-slate-400">{description}</p>
         {tags.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-2">
             {tags.map((tag) => (

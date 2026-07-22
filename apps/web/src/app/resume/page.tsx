@@ -26,10 +26,10 @@ export default async function ResumePage() {
   const resume = await getResume();
   return (
     <>
-      <header className="flex flex-col gap-8 pb-12 pt-10 sm:flex-row sm:items-end sm:justify-between sm:pt-16">
+      <header className="flex flex-col gap-6 pb-10 pt-6 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:pb-12 sm:pt-16">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">Resume</p>
-          <h1 className="mt-5 text-4xl font-semibold tracking-[-.04em] sm:text-7xl">
+          <h1 className="mt-4 break-words text-3xl font-semibold tracking-[-.035em] sm:mt-5 sm:text-5xl md:text-7xl">
             Experience, <span className="text-slate-400">at a glance.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-400">
