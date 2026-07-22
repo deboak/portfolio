@@ -29,21 +29,21 @@ export default async function About() {
 
   return (
     <>
-      <header className="pb-16 pt-10 sm:pt-20">
+      <header className="pb-10 pt-6 sm:pb-16 sm:pt-20">
         <p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">
           {content.eyebrow}
         </p>
-        <h1 className="mt-5 max-w-5xl text-4xl font-semibold leading-[1.1] tracking-[-.04em] sm:text-7xl">
+        <h1 className="mt-4 max-w-5xl break-words text-3xl font-semibold leading-[1.12] tracking-[-.035em] sm:mt-5 sm:text-5xl md:text-7xl">
           {content.title}
         </h1>
       </header>
       <section className="grid gap-8 lg:grid-cols-[1.2fr_.8fr]">
-        <div className="rounded-[2rem] bg-white p-8 shadow-soft sm:p-12">
+        <div className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:rounded-[2rem] sm:p-12">
           <h2 className="text-2xl font-semibold">{content.introTitle}</h2>
-          <p className="mt-6 text-justify text-base leading-8 text-slate-300 sm:text-lg sm:leading-9">
+          <p className="mt-6 text-pretty text-base leading-8 text-slate-300 sm:text-lg sm:leading-9">
             {content.intro}
           </p>
-          <p className="mt-5 text-justify text-base leading-8 text-slate-300 sm:text-lg sm:leading-9">
+          <p className="mt-5 text-pretty text-base leading-8 text-slate-300 sm:text-lg sm:leading-9">
             {content.body}
           </p>
           <Link
@@ -68,7 +68,7 @@ function Value({ number, title, text }: { number: string; title: string; text: s
     <article className="card">
       <span className="text-sm font-semibold text-accent">{number}</span>
       <h2 className="mt-6 text-xl font-semibold">{title}</h2>
-      <p className="mt-2 text-justify leading-7 text-slate-400">{text}</p>
+      <p className="mt-2 text-pretty leading-7 text-slate-400">{text}</p>
     </article>
   );
 }

@@ -24,14 +24,14 @@ export default function Contact() {
 
   return (
     <>
-      <header className="pb-14 pt-10 sm:pt-16">
+      <header className="pb-10 pt-6 sm:pb-14 sm:pt-16">
         <p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">Contact</p>
-        <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-[1.1] tracking-[-.04em] sm:text-7xl">
+        <h1 className="mt-4 max-w-4xl break-words text-3xl font-semibold leading-[1.12] tracking-[-.035em] sm:mt-5 sm:text-5xl md:text-7xl">
           Let's make something <span className="text-slate-400">worth using.</span>
         </h1>
       </header>
       <div className="grid overflow-hidden rounded-[2.25rem] bg-white shadow-soft lg:grid-cols-[.75fr_1.25fr]">
-        <aside className="bg-ink p-8 text-white sm:p-12">
+        <aside className="bg-ink p-5 text-white sm:p-12">
           <p className="text-sm font-semibold uppercase tracking-[.16em] text-blue-300">
             Start a conversation
           </p>
@@ -47,7 +47,7 @@ export default function Contact() {
           </div>
         </aside>
         <form
-          className="grid gap-5 p-8 sm:p-12"
+          className="grid gap-5 p-5 sm:p-12"
           onSubmit={handleSubmit(async (data) => {
             try {
               const response = await fetch(`${api}/contact`, {
