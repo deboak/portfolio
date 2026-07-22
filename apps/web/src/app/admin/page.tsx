@@ -316,6 +316,20 @@ function ProjectManager({
           onChange={(e) => set('technologies', e.target.value)}
           className="rounded bg-black/30 p-3 md:col-span-2"
         />
+        <input
+          type="url"
+          placeholder="Project URL, e.g. https://probabiliti.ng"
+          value={form.liveUrl}
+          onChange={(e) => set('liveUrl', e.target.value)}
+          className="rounded bg-black/30 p-3"
+        />
+        <input
+          type="url"
+          placeholder="Repository URL (optional)"
+          value={form.repositoryUrl}
+          onChange={(e) => set('repositoryUrl', e.target.value)}
+          className="rounded bg-black/30 p-3"
+        />
         <label>
           <input
             type="checkbox"
