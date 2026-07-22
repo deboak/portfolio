@@ -27,14 +27,18 @@ export default async function Project({ params }: { params: Promise<{ slug: stri
                 <a
                   className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white"
                   href={project.liveUrl}
+                  target="_blank"
+                  rel="noreferrer"
                 >
-                  View live
+                  Visit project
                 </a>
               )}
               {project.repositoryUrl && (
                 <a
                   className="rounded-full border border-black/15 px-5 py-2.5 text-sm font-semibold"
                   href={project.repositoryUrl}
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   Source code
                 </a>
