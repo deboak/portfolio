@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { PHASE_DEVELOPMENT_SERVER } from 'next/constants';
 const development = process.env.NODE_ENV !== 'production';
 const securityHeaders = [
   {
@@ -10,11 +11,19 @@ const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
 ];
-const config: NextConfig = {
-  output: 'standalone',
-  poweredByHeader: false,
-  async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }];
-  },
-};
-export default config;
+export default function createConfig(phase: string): NextConfig {
+  const apiProxyTarget = process.env.API_PROXY_TARGET?.replace(/\/$/, '');
+  return {
+    distDir: phase === PHASE_DEVELOPMENT_SERVER ? '.next-dev' : '.next',
+    output: 'standalone',
+    poweredByHeader: false,
+    async headers() {
+      return [{ source: '/:path*', headers: securityHeaders }];
+    },
+    async rewrites() {
+      return apiProxyTarget
+        ? [{ source: '/api/:path*', destination: `${apiProxyTarget}/api/:path*` }]
+        : [];
+    },
+  };
+}

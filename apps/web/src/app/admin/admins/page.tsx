@@ -1,11 +1,11 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { AdminNavigation } from '@/components/admin-navigation';
 import { adminFetch } from '@/lib/admin-api';
 
 type Admin = { id: string; email: string; createdAt: string };
@@ -56,17 +56,7 @@ export default function AdminsPage() {
   if (me.isError) return null;
   return (
     <>
-      <nav className="card mb-8 flex flex-wrap gap-2 text-sm">
-        <Link className="rounded-lg px-3 py-2 hover:bg-white/10" href="/">
-          Home
-        </Link>
-        <Link className="rounded-lg px-3 py-2 hover:bg-white/10" href="/admin">
-          Dashboard
-        </Link>
-        <Link className="rounded-lg bg-cyan-300/10 px-3 py-2 text-cyan-200" href="/admin/admins">
-          Administrators
-        </Link>
-      </nav>
+      <AdminNavigation />
       <section className="max-w-2xl">
         <p className="font-mono text-accent">Restricted administration</p>
         <h1 className="mt-2 text-4xl font-bold">Administrators</h1>

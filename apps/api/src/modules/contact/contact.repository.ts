@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@prisma/client';
-import type { ContactInput } from './contact.schemas.js';
+import type { ContactInput, ContactListQuery } from './contact.schemas.js';
 
 export class ContactRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -12,10 +12,18 @@ export class ContactRepository {
       data: { status: 'FAILED', error: 'Queue unavailable' },
     });
   }
-  list() {
-    return this.prisma.contactSubmission.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-    });
+  async list(page: ContactListQuery) {
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.contactSubmission.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: page.limit + 1,
+        ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
+      }),
+      this.prisma.contactSubmission.count(),
+    ]);
+    return { items, total };
+  }
+  get(id: string) {
+    return this.prisma.contactSubmission.findUnique({ where: { id } });
   }
 }

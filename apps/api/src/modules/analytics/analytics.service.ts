@@ -64,7 +64,7 @@ export class AnalyticsService {
   async topContent() {
     const cached = await this.cacheStore.get<unknown>('analytics:top');
     if (cached) return cached;
-    const [projects, posts] = await Promise.all([
+    const [projects, posts, contactCount] = await Promise.all([
       this.prisma.project.findMany({
         where: { published: true },
         orderBy: { viewCount: 'desc' },
@@ -77,8 +77,9 @@ export class AnalyticsService {
         take: 5,
         select: { id: true, title: true, slug: true, viewCount: true },
       }),
+      this.prisma.contactSubmission.count(),
     ]);
-    const value = { projects, posts };
+    const value = { projects, posts, contactCount };
     await this.cacheStore.set('analytics:top', value, 60);
     return value;
   }

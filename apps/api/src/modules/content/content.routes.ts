@@ -2,13 +2,21 @@ import { Router } from 'express';
 import { validate } from '../../middleware/validate.js';
 import { requireAuth, requireCsrf } from '../auth/index.js';
 import { contentController } from './content.module.js';
-import { idParams, listQuery, postInput, projectInput, slugParams } from './content.schemas.js';
+import {
+  aboutInput,
+  idParams,
+  listQuery,
+  postInput,
+  projectInput,
+  slugParams,
+} from './content.schemas.js';
 
 export const publicContentRouter = Router();
 publicContentRouter.get('/projects', validate(listQuery), contentController.listProjects);
 publicContentRouter.get('/projects/:slug', validate(slugParams), contentController.getProject);
 publicContentRouter.get('/posts', validate(listQuery), contentController.listPosts);
 publicContentRouter.get('/posts/:slug', validate(slugParams), contentController.getPost);
+publicContentRouter.get('/about', contentController.getAbout);
 
 export const adminContentRouter = Router();
 adminContentRouter.use(requireAuth);
@@ -31,6 +39,8 @@ adminContentRouter.delete(
   validate(idParams),
   contentController.deleteProject,
 );
+adminContentRouter.get('/about', contentController.getAbout);
+adminContentRouter.put('/about', requireCsrf, validate(aboutInput), contentController.updateAbout);
 adminContentRouter.get('/posts', validate(listQuery), contentController.listAllPosts);
 adminContentRouter.post('/posts', requireCsrf, validate(postInput), contentController.createPost);
 adminContentRouter.put(

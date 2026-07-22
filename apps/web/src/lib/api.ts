@@ -17,6 +17,19 @@ export type Post = {
   content: string;
   publishedAt: string | null;
 };
+export type AboutContent = {
+  eyebrow: string;
+  title: string;
+  introTitle: string;
+  intro: string;
+  body: string;
+  valueOneTitle: string;
+  valueOneText: string;
+  valueTwoTitle: string;
+  valueTwoText: string;
+  valueThreeTitle: string;
+  valueThreeText: string;
+};
 const baseUrl =
   process.env.INTERNAL_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
 async function get<T>(path: string): Promise<T> {
@@ -29,4 +42,5 @@ export const api = {
   project: (slug: string) => get<Project>(`/projects/${slug}`),
   posts: () => get<Post[]>('/posts'),
   post: (slug: string) => get<Post>(`/posts/${slug}`),
+  about: () => get<AboutContent>('/about'),
 };

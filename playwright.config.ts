@@ -1,3 +1,4 @@
 import { defineConfig,devices } from '@playwright/test';
+
 const externalBaseUrl=process.env.E2E_BASE_URL;
 export default defineConfig({testDir:'./e2e',fullyParallel:false,forbidOnly:Boolean(process.env.CI),retries:process.env.CI?2:0,workers:1,reporter:process.env.CI?[['line'],['html',{open:'never'}]]:'list',use:{baseURL:externalBaseUrl??'http://localhost:3001',trace:'on-first-retry',screenshot:'only-on-failure'},projects:[{name:'chromium',use:{...devices['Desktop Chrome']}}],webServer:externalBaseUrl?undefined:{command:'npm run dev -w @portfolio/web',url:'http://localhost:3001',reuseExistingServer:!process.env.CI,timeout:120_000,stdout:'pipe',stderr:'pipe'}});

@@ -1,7 +1,7 @@
 import type { RequestHandler, Response } from 'express';
 import type { AnalyticsService } from '../analytics/analytics.service.js';
 import type { ContentService } from './content.service.js';
-import type { ListQuery, PostInput, ProjectInput } from './content.schemas.js';
+import type { AboutInput, ListQuery, PostInput, ProjectInput } from './content.schemas.js';
 const wrap =
   (handler: RequestHandler): RequestHandler =>
   (req, res, next) =>
@@ -74,4 +74,8 @@ export class ContentController {
     await this.service.deletePost(req.params.id as string);
     res.status(204).end();
   });
+  getAbout = wrap(async (_req, res) => res.json({ data: await this.service.about() }));
+  updateAbout = wrap(async (req, res) =>
+    res.json({ data: await this.service.updateAbout(req.body as AboutInput) }),
+  );
 }
