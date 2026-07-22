@@ -29,7 +29,7 @@ export default async function ResumePage() {
       <header className="flex flex-col gap-8 pb-12 pt-10 sm:flex-row sm:items-end sm:justify-between sm:pt-16">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">Resume</p>
-          <h1 className="mt-5 text-5xl font-semibold tracking-[-.045em] sm:text-7xl">
+          <h1 className="mt-5 text-4xl font-semibold tracking-[-.04em] sm:text-7xl">
             Experience, <span className="text-slate-400">at a glance.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-400">

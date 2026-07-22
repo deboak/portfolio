@@ -8,7 +8,7 @@ export default async function Projects() {
     <>
       <header className="pb-14 pt-10 sm:pt-16">
         <p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">Selected work</p>
-        <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.05] tracking-[-.045em] sm:text-7xl">
+        <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-[1.1] tracking-[-.04em] sm:text-7xl">
           Ideas engineered into <span className="text-slate-400">working products.</span>
         </h1>
         <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-400">

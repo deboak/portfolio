@@ -14,10 +14,12 @@ export default async function Project({ params }: { params: Promise<{ slug: stri
             <p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">
               Project case study
             </p>
-            <h1 className="mt-5 text-5xl font-semibold tracking-[-.045em] sm:text-7xl">
+            <h1 className="mt-5 text-4xl font-semibold tracking-[-.04em] sm:text-7xl">
               {project.title}
             </h1>
-            <p className="mt-7 max-w-3xl text-xl leading-9 text-slate-400">{project.summary}</p>
+            <p className="mt-7 max-w-3xl text-justify text-lg leading-8 text-slate-400 sm:text-xl sm:leading-9">
+              {project.summary}
+            </p>
           </div>
           {project.mediaAsset?.status === 'READY' && (
             <div className="order-1 overflow-hidden rounded-3xl bg-black/5 shadow-soft lg:order-2">
@@ -43,7 +45,9 @@ export default async function Project({ params }: { params: Promise<{ slug: stri
       <div className="grid gap-12 py-14 lg:grid-cols-[1fr_18rem]">
         <section>
           <h2 className="text-2xl font-semibold tracking-tight">The work</h2>
-          <p className="mt-5 max-w-3xl text-lg leading-9 text-slate-300">{project.description}</p>
+          <p className="mt-5 max-w-3xl whitespace-pre-line text-justify text-base leading-8 text-slate-300 sm:text-lg sm:leading-9">
+            {project.description}
+          </p>
           {(project.liveUrl || project.repositoryUrl) && (
             <div className="mt-8 flex gap-3">
               {project.liveUrl && (

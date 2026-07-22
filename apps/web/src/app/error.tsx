@@ -13,7 +13,9 @@ export default function ErrorPage({
       <p className="text-sm font-semibold uppercase tracking-[.2em] text-accent">
         Something went wrong
       </p>
-      <h1 className="mt-5 text-5xl font-semibold tracking-[-.04em]">This page couldn't load.</h1>
+      <h1 className="mt-5 text-4xl font-semibold tracking-[-.04em] sm:text-5xl">
+        This page couldn't load.
+      </h1>
       <p className="mt-5 leading-8 text-slate-400">
         The content service may be temporarily unavailable. Try again or return home.
       </p>
